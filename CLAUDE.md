@@ -64,5 +64,24 @@ Regras de entrega:
 - Várias células da planilha mestre mostram `#REF!`/`#N/A`; ignorar esses campos e não citar como dado.
 - Cliente com conta em mais de um ID (ex.: Miyamura tem "Cartao" e "Pix" no Meta): somar e mostrar o detalhamento.
 
+## Particularidades por cliente
+
+### Empório Mega 100 (lead gen / inside sales via WhatsApp, B2B para pizzarias, lanchonetes e restaurantes)
+Aplicar sempre que o usuário perguntar sobre "Empório Mega 100", "Mega 100" ou "Emporio".
+- **Linha na `IDS DOS CLIENTES`:** não preenchida (confirmado pelo usuário). Mapeamento confirmado por ele: Meta Ads = conta **CTA MEGA 100** (`1051821444101775`). **Google Ads: não tem**, não consultar nem citar como lacuna. Se a linha for preenchida na aba, a aba passa a ser a fonte e este bloco deve ser limpo.
+- **Responsáveis** (`Clientes ativos`): conta Luma, tráfego Wallace. Fee R$ 6.027,00, mídia projetada R$ 2.000,00/mês, CRM "Não tem".
+- **Mídia (Windsor, `facebook`):** campanha `01-[LEAD/WPP] CBO`. Resultado = leads (`actions_lead`) e conversas WhatsApp (`actions_onsite_conversion_messaging_conversation_started_7d`). Os dois eventos provavelmente se sobrepõem: mostrar os dois, não somar, e dizer qual usou no CPL. Não falar em compra, receita ou ROAS.
+- **Planilha de leads:** arquivo separado (não é aba da mestre), **"[Empório Mega 100] Leads formulário"**, fileId `1x15ASW-nhI-csH5i-ejNbZlcgyiNgO8q80IPy6UrV4w`.
+  - `read_file_content` só devolve amostra das primeiras linhas. Para contar, usar `download_file_content` com `exportMimeType` xlsx (o resultado é salvo em arquivo), decodificar o base64 e processar com Python (`openpyxl`, `python3 -I`, em pasta nova do scratchpad).
+  - **Aba `Dados`** (cabeçalho na linha 2, dados da linha 3): é onde está o funil e o acompanhamento. Coluna A = timestamp (UTC, pode vir como texto ISO ou datetime), B Nome, C Tel, E tipo de estabelecimento, F cidade, G–M 1º a 7º contato, N Temperatura (frio/morno/quente/desqualificado), O Status, P Informações, Q Fechou, R–V UTMs.
+  - **Abas `Vend1`, `Vend2`, `vend3`, `vend4`:** os 4 vendedores, distribuição em rodízio. Coluna A = timestamp. Servem para conferir volume (soma das 4 = total de leads). Nelas o acompanhamento costuma estar vazio.
+  - Ignorar `_controle` (contador do rodízio). Não usar dados pessoais dos leads (nome, telefone, e-mail) na entrega.
+- **Como calcular:** período em datas de calendário, comparado com o período anterior de mesmo tamanho. Leads da planilha = linhas da `Dados` com data no período (UTC; citar a diferença de fuso se relevante). Calcular: leads, % com 1º contato (G = TRUE ou "x"), distribuição de Temperatura, Status, e fechamentos.
+  - **Fechou:** o campo é texto livre ("Sim", "Fechou", "Fechou?", "Negociação", "Cadastrado", "Perdido"). Só contar venda confirmada quando for "Sim" ou "Fechou" sem interrogação. "Fechou?" e "Negociação" são pendentes e devem aparecer à parte. Perguntar ao usuário em caso de dúvida.
+  - **Cruzamento:** plataforma (leads Meta) x planilha (total de leads no período). Divergência pequena (<2%) é normal. UTMs costumam estar vazias, então comparar só totais e dizer isso.
+- **Foco da análise (Argus):** a restrição do funil é o comercial, não a mídia. Sempre mostrar a taxa de 1º contato, qualificação (morno/quente) e fechamentos ao lado do CPL. CPL baixo sem contato não é resultado. Não recomendar escalar verba enquanto o contato com os leads estiver baixo (referência dada na última análise: voltar a escalar com 1º contato acima de 50%, ajustável pelo usuário).
+- **Ações sugeridas por padrão:** Luma cobra o cliente por SLA de 1º contato e atualização diária da planilha pelos 4 vendedores; Wallace mantém ou escala verba conforme o contato e preenche as UTMs; pedir os fechamentos reais da semana para calcular custo por venda.
+- **Referência (07/10 a 13/10/2026, só para comparação futura):** investimento 479,96; 485 leads Meta (CPL 0,99); 639 conversas; 481 leads na planilha; 14 com 1º contato (2,9%); 0 vendas confirmadas.
+
 ## Manutenção
 Se novos clientes entrarem, a fonte é a aba `IDS DOS CLIENTES`; não duplicar IDs neste arquivo.
